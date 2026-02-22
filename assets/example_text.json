@@ -1,0 +1,33 @@
+{
+  "type": "normal",
+  "render_execute": "null",
+  "start_music": {
+    "music": "null",
+    "length": 0
+  },
+  "next": {
+    
+  },
+  "execute": {
+    
+  },
+  "data": [
+    {
+      "text": "",
+      "character": {
+        "image": "",
+        "image_x": 0,"image_y": 0,"circle": 1.0,
+        "x": 660,"y": 0
+      },
+      "background": "",
+      "sound": "null",
+      "render_execute": {
+        "type": "normal",
+        "data": ""
+      }
+    }
+  ],
+  "resources": [
+    
+  ]
+}

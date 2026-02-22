@@ -1,0 +1,27 @@
+{
+  "type": "cg",
+  "render_execute": "null",
+  "start_music": {
+    "music": "null",
+    "length": -1
+  },
+  "next": {
+    
+  },
+  "execute": {
+    
+  },
+  "data": [
+    {
+      "id": 0,
+      "background": "",
+      "render_execute": {
+        "type": "normal",
+        "data": "null"
+      }
+    }
+  ],
+  "resources": [
+    
+  ]
+}
