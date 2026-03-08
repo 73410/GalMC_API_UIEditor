@@ -12,6 +12,68 @@ from PyQt5.QtGui import QFont, QPixmap
 from res_manager import Resources_Manager
 
 
+APP_STYLESHEET = """
+QWidget {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    font-size: 13px;
+}
+QMainWindow, QDialog {
+    background-color: #f6f8fb;
+}
+QGroupBox {
+    border: 1px solid #d7dce5;
+    border-radius: 8px;
+    margin-top: 10px;
+    padding-top: 12px;
+    background-color: #ffffff;
+    font-weight: 600;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 12px;
+    padding: 0 4px;
+}
+QLineEdit, QTextEdit, QComboBox, QTableWidget {
+    border: 1px solid #cdd4df;
+    border-radius: 6px;
+    padding: 6px;
+    background-color: #ffffff;
+}
+QPushButton {
+    background-color: #3f7cff;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    min-height: 16px;
+}
+QPushButton:hover {
+    background-color: #3068de;
+}
+QPushButton:disabled {
+    background-color: #b7c4e4;
+    color: #e8ecf7;
+}
+QHeaderView::section {
+    background-color: #edf2ff;
+    color: #273245;
+    border: none;
+    border-bottom: 1px solid #d6deee;
+    padding: 8px;
+    font-weight: 600;
+}
+"""
+
+
+def build_section(title):
+    group = QGroupBox(title)
+    layout = QVBoxLayout()
+    layout.setContentsMargins(12, 12, 12, 12)
+    layout.setSpacing(10)
+    group.setLayout(layout)
+    return group, layout
+
+
 class NextWindow(QDialog):
     """next窗口"""
     def __init__(self, next_data, execute_data, project_dir, res_manager, parent=None):
@@ -28,6 +90,13 @@ class NextWindow(QDialog):
     def init_ui(self):
         """初始化界面"""
         layout = QVBoxLayout()
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
+        self.setStyleSheet(APP_STYLESHEET)
+
+        path_group, path_layout = build_section("剧情走向")
+        execute_group, execute_layout = build_section("结束后执行")
+        choice_group, choice_layout = build_section("选项分支")
         
         # 单选按钮组
         self.radio_group = QButtonGroup(self)
@@ -35,7 +104,7 @@ class NextWindow(QDialog):
         # 直接结束
         self.radio_end = QRadioButton("直接结束")
         self.radio_group.addButton(self.radio_end, 0)
-        layout.addWidget(self.radio_end)
+        path_layout.addWidget(self.radio_end)
         
         # execute单选按钮组
         self.execute_radio_group = QButtonGroup(self)
@@ -43,34 +112,36 @@ class NextWindow(QDialog):
         # 不执行
         self.execute_null_radio = QRadioButton("不执行")
         self.execute_radio_group.addButton(self.execute_null_radio, 0)
-        layout.addWidget(self.execute_null_radio)
+        execute_layout.addWidget(self.execute_null_radio)
         
         # 执行Java代码
         self.execute_java_radio = QRadioButton("执行Java代码输入注册名")
         self.execute_radio_group.addButton(self.execute_java_radio, 1)
-        layout.addWidget(self.execute_java_radio)
+        execute_layout.addWidget(self.execute_java_radio)
         
         # Java代码输入框
         java_layout = QHBoxLayout()
         java_layout.addSpacing(30)
         self.java_input = QLineEdit()
+        self.java_input.setPlaceholderText("示例: your_mod:script_name")
         java_layout.addWidget(self.java_input)
-        layout.addLayout(java_layout)
+        execute_layout.addLayout(java_layout)
         
         # 执行指令
         self.execute_command_radio = QRadioButton("执行指令 换行就为一条指令")
         self.execute_radio_group.addButton(self.execute_command_radio, 2)
-        layout.addWidget(self.execute_command_radio)
+        execute_layout.addWidget(self.execute_command_radio)
         
         # 指令文本输入框
         self.command_input = QTextEdit()
+        self.command_input.setPlaceholderText("每行一条命令，例如:\n/say hello")
         self.command_input.setFixedSize(700, 300)
-        layout.addWidget(self.command_input)
+        execute_layout.addWidget(self.command_input)
         
         # 接着下一节
         self.radio_next = QRadioButton("接着下一节")
         self.radio_group.addButton(self.radio_next, 1)
-        layout.addWidget(self.radio_next)
+        path_layout.addWidget(self.radio_next)
         
         # 下一节情节的输入和选择框
         next_scene_layout = QHBoxLayout()
@@ -89,12 +160,12 @@ class NextWindow(QDialog):
         next_scene_layout.addWidget(next_scene_label)
         next_scene_layout.addWidget(self.next_scene_input, 3)
         next_scene_layout.addWidget(self.next_scene_combo, 1)
-        layout.addLayout(next_scene_layout)
+        path_layout.addLayout(next_scene_layout)
         
         # 选项分支
         self.radio_branch = QRadioButton("选项分支")
         self.radio_group.addButton(self.radio_branch, 2)
-        layout.addWidget(self.radio_branch)
+        choice_layout.addWidget(self.radio_branch)
         
         # 四个选项组
         self.option_inputs = []
@@ -109,7 +180,7 @@ class NextWindow(QDialog):
             self.option_inputs.append(option_input)
             option_layout.addWidget(option_label)
             option_layout.addWidget(option_input)
-            layout.addLayout(option_layout)
+            choice_layout.addLayout(option_layout)
             
             # 下一节情节
             option_scene_layout = QHBoxLayout()
@@ -129,11 +200,15 @@ class NextWindow(QDialog):
             option_scene_layout.addWidget(option_scene_label)
             option_scene_layout.addWidget(option_scene_input, 3)
             option_scene_layout.addWidget(option_scene_combo, 1)
-            layout.addLayout(option_scene_layout)
+            choice_layout.addLayout(option_scene_layout)
             
             # 空行分隔
             if i < 3:
-                layout.addSpacing(10)
+                choice_layout.addSpacing(10)
+
+        layout.addWidget(path_group)
+        layout.addWidget(execute_group)
+        layout.addWidget(choice_group)
         
         # 按钮
         button_layout = QHBoxLayout()
@@ -326,6 +401,7 @@ class FileEditorWindow(QMainWindow):
         self.res_manager = res_manager
         
         self.init_ui()
+        self.setStyleSheet(APP_STYLESHEET)
         self.load_json_data()
     
     def init_ui(self):
@@ -1011,12 +1087,14 @@ class MainWindow(QMainWindow):
         self.current_project_dir = None  # 当前打开的项目目录
         self.current_directory = "text"  # 当前显示的目录
         self.init_ui()
+        self.setStyleSheet(APP_STYLESHEET)
         self.create_menu()
 
     def init_ui(self):
         """初始化主窗口界面"""
         self.setWindowTitle("GalMC 项目制作管理器")
         self.setFixedSize(1280, 720)
+        self.setMinimumSize(1100, 680)
 
         # 中央部件
         central_widget = QWidget()
@@ -1061,6 +1139,7 @@ class MainWindow(QMainWindow):
 
         # 文件表格
         self.file_table = QTableWidget()
+        self.file_table.setAlternatingRowColors(True)
         self.file_table.setColumnCount(2)
         self.file_table.setHorizontalHeaderLabels(["文件名", "描述"])
         self.file_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -1068,6 +1147,7 @@ class MainWindow(QMainWindow):
         self.file_table.setSelectionBehavior(QTableWidget.SelectRows)
         self.file_table.doubleClicked.connect(self.on_file_double_clicked)
         self.file_table.setEnabled(False)
+        self.file_table.verticalHeader().setVisible(False)
         right_layout.addWidget(self.file_table)
 
         main_layout.addWidget(right_widget, 3)
